@@ -14,35 +14,54 @@ alert("You can choose between rock, paper, or scissors.");
 alert("Type 'exit' to quit the game at any time.");
 alert("Good luck!");
 
-let playerChoice = prompt("Enter your choice:").toLowerCase();
+    const choices = ["rock", "paper", "scissors"];
+    let playerScore = 0;
+    let computerScore = 0;
 
-if (playerChoice === "exit") {
-    alert("Thanks for playing! Goodbye!");
-} else {
-    let choices = ["rock", "paper", "scissors"];
-    let computerChoice = choices[Math.floor(Math.random() * choices.length)];
+    while (true) {
+        let playerChoice = prompt("Enter your choice (rock, paper, scissors) or type 'exit' to quit: ").toLowerCase();
 
-    alert(`Computer chose ${computerChoice}`);
+        if (playerChoice === "exit") {
+            alert("Thanks for playing! Goodbye!");
+            break;
+        }
 
-    if(playerChoice === computerChoice) {
-        alert("It is a tie!");
-    } else if (
-        (playerChoice === "rock" && computerChoice === "scissors") ||
-        (playerChoice === "paper" && computerChoice === "rock") ||
-        (playerChoice === "scissors" && computerChoice === "paper")
-    ) {
-        alert("You win!")
-    } else if (
-        playerChoice === "rock" ||
-        playerChoice === "paper" ||
-        playerChoice === "scissors"
-    ) {
-        alert("You lose!");
-    } else {
-        alert("Invalid choice. Please choose rock, paper, or scissors.");
+        if (!choices.includes(playerChoice)) {
+            alert("Invalid choice. Please choose rock, paper, or scissors.");
+            continue;
+        }
+
+
+        let computerChoice = choices[Math.floor(Math.random() * choices.length)];
+        
+        alert(`${formattedName} chose ${playerChoice}`);
+        alert(`Computer chose ${computerChoice}`);
+
+        if(playerChoice === computerChoice) {
+            alert("It is a tie!");
+        } else if (
+            (playerChoice === "rock" && computerChoice === "scissors") ||
+            (playerChoice === "paper" && computerChoice === "rock") ||
+            (playerChoice === "scissors" && computerChoice === "paper")
+        ) {
+            alert("You win this round!");
+            playerScore++
+        } else {
+            alert("You lose!");
+            computerScore++;
+        }  
+
+        alert(`Current Score - ${formattedName}: ${playerScore} | Computer: ${computerScore}`);
     }
-    alert("Game Over! Thanks for playing!");
-}
-}
+
+    if(playerScore === 5) {
+        alert(`Congratulations ${formattedName}, you won the game!`);
+    } else {
+        alert("Computer AI won before you reached 5 points. Better luck next time!");
+    }
+    alert(`Final Score - ${formattedName}: ${playerScore} | Computer: ${computerScore}`);
+    alert("Game Over. Thanks for playing!")
+    }
+
 
 startGame();
