@@ -1,67 +1,87 @@
-function startGame() {
-    alert("Welcome to the Rock, Paper, Scissors game!");
+const startBtn = document.getElementById("start-button");
+const gameScreen = document.getElementById("game-screen");
+const startScreen = document.getElementById("start-screen");
+const endScreen = document.getElementById("end-screen");
+const welcomeMessage = document.getElementById("welcome-message");
+const playerScoreDisplay = document.getElementById("player-score");
+const computerScoreDisplay = document.getElementById("computer-score");
+const resultMsg = document.getElementById("result-message");
+const finalMsg = document.getElementById("final-message");
+const playAgainBtn = document.getElementById("play-again-button");
 
-const name = prompt("Please enter your name: ");
-if (!name) {
-    alert("Name cannot be empty. Please refresh the page and try again.");
-    return;
+let playerScore = 0;
+let computerScore = 0;
+let playerName = "";
+const maxScore = 5;
+const choices = ["rock", "paper", "scissors"];
+
+
+startBtn.addEventListener("click", () => {
+    const input = document.getElementById("player-name").value.trim();
+    if (input === "") 
+        return;
+    playerName = input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
+    welcomeMessage.textContent = `Hello, ${playerName}! First to ${maxScore} wins!`;
+    startScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+    gameScreen.classList.add("active");
+});
+
+document.querySelectorAll(".choice-button").forEach(button => {
+    button.addEventListener("click" , () => {
+        playRound(button.dataset.choice);
+    });
+});
+
+function playRound(playerChoice) {
+    const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+
+    if(playerChoice === computerChoice) {
+        resultMsg.textContent = "It's a tie! You both chose " + playerChoice + ".";
+    } else if (
+        (playerChoice === "rock" && computerChoice === "scissors") ||          (playerChoice === "paper" && computerChoice === "rock") ||
+        (playerChoice === "scissors" && computerChoice === "paper")
+    ) {
+        resultMsg.textContent = "You win this round! " + playerChoice + " beats " + computerChoice + ".";
+        playerScore++
+    } else {
+        resultMsg.textContent = "You lose this round! " + computerChoice + " beats " + playerChoice + ".";
+        computerScore++;
+    }  
+
+    updateScores();
+
+    if (playerScore === maxScore || computerScore === maxScore) {
+        endGame();
+    }
 }
 
-const formattedName = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+function updateScores() {
+    playerScoreDisplay.textContent = `Your Score: ${playerScore}`;
+    computerScoreDisplay.textContent = `Computer Score: ${computerScore}`;
+}
 
-alert(`Hello, ${formattedName}! Let's play!`);
-alert("You can choose between rock, paper, or scissors.");
-alert("Type 'exit' to quit the game at any time.");
-alert("Good luck!");
+function endGame() {
+    gameScreen.classList.add("hidden");
+    endScreen.classList.remove("hidden");
+    finalMsg.textContent =
+        playerScore === maxScore
+        ? `Congratulations, ${playerName}! You won the game!`
+        : "Computer AI won before you reached 5 points. Better luck next time!";
+}
 
-    const choices = ["rock", "paper", "scissors"];
-    let playerScore = 0;
-    let computerScore = 0;
+playAgainBtn.addEventListener("click", () => {
+    playerScore = 0;
+    computerScore = 0;
+    updateScores();
+    resultMsg.textContent = "";
+    endScreen.classList.add("hidden");
+    startScreen.classList.remove("hidden");
+    startScreen.classList.add("active");
+    gameScreen.classList.remove("active");
+    document.getElementById("player-name").value = "";
+    welcomeMessage.textContent = "Welcome to Rock, Paper, Scissors!";
+    playerName = "";
+});
 
-    while (true) {
-        let playerChoice = prompt("Enter your choice (rock, paper, scissors) or type 'exit' to quit: ").toLowerCase();
-
-        if (playerChoice === "exit") {
-            alert("Thanks for playing! Goodbye!");
-            break;
-        }
-
-        if (!choices.includes(playerChoice)) {
-            alert("Invalid choice. Please choose rock, paper, or scissors.");
-            continue;
-        }
-
-
-        let computerChoice = choices[Math.floor(Math.random() * choices.length)];
-        
-        alert(`${formattedName} chose ${playerChoice}`);
-        alert(`Computer chose ${computerChoice}`);
-
-        if(playerChoice === computerChoice) {
-            alert("It is a tie!");
-        } else if (
-            (playerChoice === "rock" && computerChoice === "scissors") ||
-            (playerChoice === "paper" && computerChoice === "rock") ||
-            (playerChoice === "scissors" && computerChoice === "paper")
-        ) {
-            alert("You win this round!");
-            playerScore++
-        } else {
-            alert("You lose!");
-            computerScore++;
-        }  
-
-        alert(`Current Score - ${formattedName}: ${playerScore} | Computer: ${computerScore}`);
-    }
-
-    if(playerScore === 5) {
-        alert(`Congratulations ${formattedName}, you won the game!`);
-    } else {
-        alert("Computer AI won before you reached 5 points. Better luck next time!");
-    }
-    alert(`Final Score - ${formattedName}: ${playerScore} | Computer: ${computerScore}`);
-    alert("Game Over. Thanks for playing!")
-    }
-
-
-startGame();
+// startGame();

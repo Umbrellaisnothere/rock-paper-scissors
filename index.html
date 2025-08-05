@@ -4,10 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rock, Paper, Scissors</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <script src="script.js" defer></script>
+    <div id="start-screen" class = "screen">
+        <h1>Welcome to Rock, Paper, Scissors!</h1>
+        <input type="text" id="player-name" placeholder="Enter your name" />
+        <button id="start-button">Start Game</button>
+    </div>
+
+    <div id="game-screen" class="screen hidden">
+        <h2 id="welcome-message"></h2>
+        <div class="scoreboard">
+            <p><span id="player-score">Your Score: 0</span> : <span id="computer-score">Computer Score: 0</span></p>
+        </div>
+
+        <div class="choices">
+            <button class="choice-button" data-choice="rock">Rock</button>
+            <button class="choice-button" data-choice="paper">Paper</button>
+            <button class="choice-button" data-choice="scissors">Scissors</button>
+        </div>
+        <p id="result-message"></p>
+    </div>
+
+    <div id="end-screen" class="hidden">
+        <h2 id="final-message"></h2>
+        <button id="play-again-button">Play Again</button>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>

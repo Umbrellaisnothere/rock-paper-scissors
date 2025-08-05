@@ -1,0 +1,61 @@
+body {
+    font-family: "Segoe UI", sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+.screen {
+    display: none;
+    padding: 20px;
+}
+
+.screen.active {
+    display: block;
+}
+
+.hidden {
+    display: none;
+}
+
+input {
+    padding: 10px;
+    font-size: 16px;
+    margin: 16px 0;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 8px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+.scoreboard {
+    margin: 20px 0;
+    font-size: 18px;
+}
+
+.choices {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.choice-btn {
+  font-size: 1.2rem;
+}
+
+#result-message {
+    font-weight: bold;
+    margin-top: 20px;
+}
