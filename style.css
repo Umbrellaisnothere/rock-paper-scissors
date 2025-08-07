@@ -2,6 +2,7 @@ body {
     font-family: "Segoe UI", sans-serif;
     text-align: center;
     margin: 0;
+    height: 100%;
     padding: 20px;
     background-color: #f0f0f0;
 }
@@ -19,10 +20,26 @@ body {
     display: none;
 }
 
+.full-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 20px;
+}
+
+h1, h2 {
+  margin-bottom: 1rem;
+}
+
 input {
     padding: 10px;
     font-size: 16px;
     margin: 16px 0;
+    cursor: pointer;
 }
 
 button {
@@ -67,7 +84,20 @@ button:hover {
 }
 
 #welcome-screen {
-    display: block;
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    color: white;
+    font-size: 20px;
+    padding: 10px;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    background-color: yellowgreen;
     animation: fadeOut 2.5s ease-in-out forwards;
 }
 
@@ -118,4 +148,19 @@ button:hover {
 @keyframes fade-tie {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+
+
+@media (max-width: 600px) {
+    #welcome-screen {
+        font-size: 1.5rem;
+        padding: 20px;
+        text-align: center;
+    }
+
+    button, input {
+        width: 100%;
+        box-sizing: border-box;
+    }
 }

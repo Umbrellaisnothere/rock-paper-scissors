@@ -4,7 +4,6 @@ const gameScreen = document.getElementById("game-screen");
 const endScreen = document.getElementById("end-screen");
 
 const startButton = document.getElementById("start-button");
-const playButton = document.getElementById("play-button");
 const playAgainBtn = document.getElementById("play-again-button");
 const playerNameInput = document.getElementById("player-name");
 const nameError = document.getElementById("name-error");
@@ -33,6 +32,13 @@ setTimeout(() => {
     startScreen.classList.add("active");
     startScreen.classList.remove("hidden");
 }, 3000);
+
+window.addEventListener("DOMContentLoaded", () => {
+    const welcomeScreen = document.getElementById('welcome-screen');
+  setTimeout(() => {
+    welcomeScreen.style.display = 'none';
+  }, 2500);
+});
 
 function isValidName(name) {
     const trimmedName = name.trim().toLowerCase();
