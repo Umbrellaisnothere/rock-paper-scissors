@@ -4,14 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rock, Paper, Scissors</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <div id="start-screen" class = "screen">
-        <h1>Welcome to Rock, Paper, Scissors!</h1>
+    <div id="welcome-screen" class="screen active">
+        <h1>Rock, Paper, Scissors Game</h1>
+        <p>Get ready to play!</p>
+        <button id="play-button">Play Now</button>
+    </div>
+
+    <div id="start-screen" class = "screen active">
+        <h2>Enter your name to begin</h2>
         <input type="text" id="player-name" placeholder="Enter your name" />
         <button id="start-button">Start Game</button>
+        <p id = "name-error" class="error-message"></p>
     </div>
 
     <div id="game-screen" class="screen hidden">

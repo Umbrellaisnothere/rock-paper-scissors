@@ -59,3 +59,63 @@ button:hover {
     font-weight: bold;
     margin-top: 20px;
 }
+
+.error-message {
+    color:red;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+#welcome-screen {
+    display: block;
+    animation: fadeOut 2.5s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        display: none;
+    }
+}
+
+.win {
+    animation: pulse-green 1s ease;
+    color: green;
+    font-weight: bold;
+}
+
+.lose {
+    animation: shake-red 1s ease;
+    color: red;
+    font-weight: bold;
+}
+
+.tie {
+    animation: fade-tie 1s ease;
+    color: orange;
+    font-weight: bold;
+}
+
+@keyframes pulse-green {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shake-red {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+}
+
+@keyframes fade-tie {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
