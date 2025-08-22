@@ -1,44 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rock, Paper, Scissors</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rock Paper Scissors</title>
     <link rel="stylesheet" href="style.css" />
-</head>
+  </head>
+  <body>
 
-<body>
-    <div id="welcome-screen" class="screen full-screen">
-        <h1>Welcome to Rock, Paper, Scissors Game!</h1>
-        <p>Get ready to play!</p>
+    <div id="welcome-screen" class="screen active">
+      <h1>Welcome to Rock Paper Scissors!</h1>
+      <div class="welcome-btns">
+        <button id="start-btn">Start Game</button>
+        <button id="skip-intro-btn">Skip Intro</button>
+      </div>
     </div>
 
-    <div id="start-screen" class = "screen">
-        <h2>Enter your name to begin</h2>
-        <input type="text" id="player-name" placeholder="Enter your name" />
-        <button id="start-button">Start Game</button>
-        <p id = "name-error" class="error-message"></p>
+    <div id="name-screen" class="screen hidden">
+      <h2>Enter Your Name</h2>
+      <div class="name-form">
+        <input type="text" id="player-name" placeholder="Your name" />
+        <button id="submit-name-btn">Continue</button>
+        <div id="name-error" class="error"></div>
+      </div>
     </div>
 
     <div id="game-screen" class="screen hidden">
-        <h2 id="welcome-message"></h2>
-        <div class="scoreboard">
-            <p><span id="player-score">Your Score: 0</span> : <span id="computer-score">Computer Score: 0</span></p>
-        </div>
-
-        <div class="choices">
-            <button class="choice-button" data-choice="rock">Rock</button>
-            <button class="choice-button" data-choice="paper">Paper</button>
-            <button class="choice-button" data-choice="scissors">Scissors</button>
-        </div>
-        <p id="result-message"></p>
+      <h2 id="greeting"></h2>
+      <div class="scoreboard">
+        <p id="player-score">Player: 0</p>
+        <p id="computer-score">Computer: 0</p>
+      </div>
+      <div class="choices">
+        <button class="choice-button" data-choice="rock">🪨 Rock</button>
+        <button class="choice-button" data-choice="paper">📄 Paper</button>
+        <button class="choice-button" data-choice="scissors">✂️ Scissors</button>
+      </div>
+      <p id="result"></p>
     </div>
 
     <div id="end-screen" class="screen hidden">
-        <h2 id="final-message"></h2>
-        <button id="play-again-button">Play Again</button>
+      <h2 id="final-result"></h2>
+      <button id="restart-btn">Play Again</button>
+    </div>
+
+    <div id="sidebar">
+      <h3>Instructions</h3>
+      <ul>
+        <li><span class="inst-ico">📝</span> Enter your name to begin.</li>
+        <li><span class="inst-ico">✋</span> Choose Rock, Paper, or Scissors.</li>
+        <li><span class="inst-ico">🏆</span> First to 5 points wins.</li>
+        <li><span class="inst-ico">🔄</span> You can restart after each game.</li>
+      </ul>
     </div>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
