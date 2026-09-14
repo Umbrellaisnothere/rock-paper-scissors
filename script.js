@@ -6,8 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const sidebar = document.getElementById("sidebar");
 
   const startBtn = document.getElementById("start-btn");
-  const skipIntroBtn = document.getElementById("skip-intro-btn");
-  const submitNameBtn = document.getElementById("submit-name-btn");
+  const nameForm = document.getElementById("name-form");
   const restartBtn = document.getElementById("restart-btn");
 
   const playerNameInput = document.getElementById("player-name");
@@ -23,7 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let playerName = "";
   let playerScore = 0;
   let computerScore = 0;
+  let isRoundLocked = false;
+  let endGameTimeoutId = null;
   const maxScore = 5;
+  const MATCH_END_DELAY_MS = 1100;
 
   function show(el) {
     el.classList.remove("hidden");
@@ -35,45 +37,89 @@ document.addEventListener("DOMContentLoaded", () => {
     el.classList.add("hidden");
   }
 
-  function toNameScreen() {
-    hide(welcomeScreen);
-    show(nameScreen);
+  function setChoicesEnabled(enabled) {
+    choices.forEach((btn) => {
+      btn.disabled = !enabled;
+    });
   }
 
-  startBtn.addEventListener("click", toNameScreen);
-  skipIntroBtn.addEventListener("click", toNameScreen);
+  function lockRound() {
+    isRoundLocked = true;
+    setChoicesEnabled(false);
+  }
 
-  submitNameBtn.addEventListener("click", () => {
-    const name = playerNameInput.value.trim();
-    if (name.length < 2) {
-      nameError.textContent = "Please enter your name (at least 2 characters).";
-      return;
+  function unlockRound() {
+    isRoundLocked = false;
+    setChoicesEnabled(true);
+  }
+
+  function clearScheduledTimers() {
+    if (endGameTimeoutId !== null) {
+      clearTimeout(endGameTimeoutId);
+      endGameTimeoutId = null;
     }
-    nameError.textContent = "";
-    playerName = name;
-    greeting.textContent = `Hello, ${playerName}! First to ${maxScore} wins.`;
-    resetScores();
+  }
+
+  function startMatch() {
+    clearScheduledTimers();
+    playerScore = 0;
+    computerScore = 0;
+    resultText.textContent = "";
+    updateScores();
+    unlockRound();
+    hide(welcomeScreen);
     hide(nameScreen);
+    hide(endScreen);
     show(gameScreen);
     sidebar.classList.remove("hidden");
+  }
+
+  function showNameError(message) {
+    nameError.textContent = message;
+    playerNameInput.setAttribute("aria-invalid", "true");
+  }
+
+  function clearNameError() {
+    nameError.textContent = "";
+    playerNameInput.setAttribute("aria-invalid", "false");
+  }
+
+  startBtn.addEventListener("click", () => {
+    hide(welcomeScreen);
+    show(nameScreen);
+    playerNameInput.focus();
+  });
+
+  nameForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const name = playerNameInput.value.trim();
+    if (name.length < 2) {
+      showNameError("Please enter your name (at least 2 characters).");
+      playerNameInput.focus();
+      return;
+    }
+    clearNameError();
+    playerName = name;
+    greeting.textContent = `Hello, ${playerName}! First to ${maxScore} wins.`;
+    startMatch();
   });
 
   restartBtn.addEventListener("click", () => {
-    hide(endScreen);
-    show(nameScreen);
-    sidebar.classList.remove("hidden");
-    playerNameInput.value = "";
-    resultText.textContent = "";
+    startMatch();
   });
 
-  choices.forEach(btn => {
+  choices.forEach((btn) => {
     btn.addEventListener("click", () => {
       playRound(btn.dataset.choice);
     });
   });
 
   function playRound(playerChoice) {
+    if (isRoundLocked) return;
     if (playerScore >= maxScore || computerScore >= maxScore) return;
+
+    lockRound();
+
     const options = ["rock", "paper", "scissors"];
     const computerChoice = options[Math.floor(Math.random() * options.length)];
     if (playerChoice === computerChoice) {
@@ -90,18 +136,24 @@ document.addEventListener("DOMContentLoaded", () => {
       resultText.textContent = `You lose! ${computerChoice} beats ${playerChoice}.`;
     }
     updateScores();
-    if (playerScore >= maxScore || computerScore >= maxScore) endGame();
+
+    if (playerScore >= maxScore || computerScore >= maxScore) {
+      endGameTimeoutId = setTimeout(() => {
+        endGameTimeoutId = null;
+        endGame();
+      }, MATCH_END_DELAY_MS);
+      return;
+    }
+
+    // Defer unlock so extra clicks already queued in this turn cannot start another round.
+    setTimeout(() => {
+      unlockRound();
+    }, 0);
   }
 
   function updateScores() {
     playerScoreText.textContent = `${playerName || "Player"}: ${playerScore}`;
     computerScoreText.textContent = `Computer: ${computerScore}`;
-  }
-
-  function resetScores() {
-    playerScore = 0;
-    computerScore = 0;
-    updateScores();
   }
 
   function endGame() {
