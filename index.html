@@ -11,18 +11,26 @@
     <div id="welcome-screen" class="screen active">
       <h1>Welcome to Rock Paper Scissors!</h1>
       <div class="welcome-btns">
-        <button id="start-btn">Start Game</button>
-        <button id="skip-intro-btn">Skip Intro</button>
+        <button type="button" id="start-btn">Start Game</button>
       </div>
     </div>
 
     <div id="name-screen" class="screen hidden">
       <h2>Enter Your Name</h2>
-      <div class="name-form">
-        <input type="text" id="player-name" placeholder="Your name" />
-        <button id="submit-name-btn">Continue</button>
-        <div id="name-error" class="error"></div>
-      </div>
+      <form id="name-form" class="name-form">
+        <label for="player-name">Your name</label>
+        <input
+          type="text"
+          id="player-name"
+          name="player-name"
+          placeholder="Your name"
+          autocomplete="nickname"
+          aria-describedby="name-error"
+          aria-invalid="false"
+        />
+        <button type="submit" id="submit-name-btn">Continue</button>
+        <div id="name-error" class="error" role="alert"></div>
+      </form>
     </div>
 
     <div id="game-screen" class="screen hidden">
@@ -32,16 +40,16 @@
         <p id="computer-score">Computer: 0</p>
       </div>
       <div class="choices">
-        <button class="choice-button" data-choice="rock">🪨 Rock</button>
-        <button class="choice-button" data-choice="paper">📄 Paper</button>
-        <button class="choice-button" data-choice="scissors">✂️ Scissors</button>
+        <button type="button" class="choice-button" data-choice="rock">🪨 Rock</button>
+        <button type="button" class="choice-button" data-choice="paper">📄 Paper</button>
+        <button type="button" class="choice-button" data-choice="scissors">✂️ Scissors</button>
       </div>
       <p id="result"></p>
     </div>
 
     <div id="end-screen" class="screen hidden">
       <h2 id="final-result"></h2>
-      <button id="restart-btn">Play Again</button>
+      <button type="button" id="restart-btn">Play Again</button>
     </div>
 
     <div id="sidebar">
