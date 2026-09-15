@@ -21,8 +21,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const computerHandVisual = document.getElementById("computer-hand-visual");
   const computerHandLabel = document.getElementById("computer-hand-label");
   const resultEl = document.getElementById("result");
+  const resultMark = document.getElementById("result-mark");
   const resultHeadline = document.getElementById("result-headline");
   const resultDetail = document.getElementById("result-detail");
+  const matchObjective = document.getElementById("match-objective");
+  const playerScoreCard = document.querySelector(".score-card--player");
+  const computerScoreCard = document.querySelector(".score-card--computer");
   const matchSummary = document.getElementById("match-summary");
   const endStatus = document.getElementById("end-status");
   const endWinner = document.getElementById("end-winner");
@@ -112,10 +116,12 @@ document.addEventListener("DOMContentLoaded", () => {
     card.classList.remove("is-thinking");
     if (!choice) {
       visual.textContent = "?";
-      label.textContent = "Waiting";
+      label.textContent = side === "player" ? "Your move" : "Waiting";
       visual.classList.remove("is-revealing");
+      card.classList.add("is-waiting");
       return;
     }
+    card.classList.remove("is-waiting");
     visual.textContent = HANDS[choice].emoji;
     label.textContent = HANDS[choice].name;
     if (animate) {
@@ -126,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setComputerThinking() {
+    computerHandCard.classList.remove("is-waiting");
     computerHandCard.classList.add("is-thinking");
     computerHandVisual.classList.remove("is-revealing");
     computerHandVisual.textContent = "?";
@@ -144,6 +151,10 @@ document.addEventListener("DOMContentLoaded", () => {
     resultEl.classList.add(`result--${kind}`);
     resultHeadline.textContent = headline;
     resultDetail.textContent = detail || "";
+    if (kind === "win") resultMark.textContent = "✓";
+    else if (kind === "lose") resultMark.textContent = "✕";
+    else if (kind === "draw") resultMark.textContent = "=";
+    else resultMark.textContent = "";
     if (kind === "win" || kind === "lose" || kind === "draw") {
       restartAnimation(resultEl, "is-entering");
     }
@@ -158,11 +169,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const computerAtPoint = computerScore === maxScore - 1;
     playerMatchPoint.classList.toggle("is-active", playerAtPoint);
     computerMatchPoint.classList.toggle("is-active", computerAtPoint);
+    playerScoreCard.classList.toggle("is-match-point", playerAtPoint);
+    computerScoreCard.classList.toggle("is-match-point", computerAtPoint);
+    matchObjective.classList.toggle("is-match-point", playerAtPoint || computerAtPoint);
+    if (playerAtPoint && computerAtPoint) {
+      matchObjective.textContent = "Both at match point";
+    } else if (playerAtPoint || computerAtPoint) {
+      matchObjective.textContent = "Match point";
+    } else {
+      matchObjective.textContent = "First to 5";
+    }
   }
 
   function clearSelectedChoices() {
     choices.forEach((btn) => {
-      btn.classList.remove("is-selected");
+      btn.classList.remove("is-selected", "is-resolved");
       btn.setAttribute("aria-pressed", "false");
     });
   }
@@ -183,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
     lastRound = null;
     setHand("player", null);
     setHand("computer", null);
-    setResult("idle", "Choose your hand", "");
+    setResult("idle", "Make your move", "Choose Rock, Paper, or Scissors");
     playerScoreText.classList.remove("is-pulsed");
     computerScoreText.classList.remove("is-pulsed");
     updateMatchPoint();
@@ -281,6 +302,11 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     setResult(kind, headline, detail);
+    choices.forEach((btn) => {
+      if (btn.classList.contains("is-selected")) {
+        btn.classList.add("is-resolved");
+      }
+    });
     updateScores();
     if (scorer === "player") pulseScore(playerScoreText);
     if (scorer === "computer") pulseScore(computerScoreText);
@@ -295,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
     markSelectedChoice(playerChoice);
     setHand("player", playerChoice, { animate: true });
     setComputerThinking();
-    setResult("pending", "", "");
+    setResult("pending", "Your move is in", "Computer is choosing");
 
     const options = ["rock", "paper", "scissors"];
     const computerChoice = options[Math.floor(Math.random() * options.length)];

@@ -9,14 +9,17 @@
   <body>
 
     <div id="welcome-screen" class="screen active">
-      <h1>Welcome to Rock Paper Scissors!</h1>
+      <p class="screen-kicker">First to 5</p>
+      <h1>Rock Paper Scissors</h1>
+      <p class="screen-lead">Make your move. Beat the computer.</p>
       <div class="welcome-btns">
         <button type="button" id="start-btn" class="btn-primary">Start Game</button>
       </div>
     </div>
 
     <div id="name-screen" class="screen hidden">
-      <h2>Enter Your Name</h2>
+      <p class="screen-kicker">Step into the arena</p>
+      <h2>Who is playing?</h2>
       <form id="name-form" class="name-form">
         <label for="player-name">Your name</label>
         <input
@@ -36,7 +39,7 @@
     <div id="game-screen" class="screen hidden">
       <div class="arena">
         <h2 class="sr-only">Match versus Computer</h2>
-        <p class="match-objective">First to 5</p>
+        <p id="match-objective" class="match-objective">First to 5</p>
 
         <section class="scoreboard" aria-label="Score">
           <div class="score-card score-card--player">
@@ -58,7 +61,7 @@
           <div class="hand-card" id="player-hand-card">
             <span class="hand-owner">You</span>
             <span id="player-hand-visual" class="hand-visual" aria-hidden="true">?</span>
-            <span id="player-hand-label" class="hand-label">Waiting</span>
+            <span id="player-hand-label" class="hand-label">Your move</span>
           </div>
           <p class="hands-vs" aria-hidden="true">VS</p>
           <div class="hand-card" id="computer-hand-card">
@@ -69,22 +72,26 @@
         </section>
 
         <section id="result" class="result result--idle" aria-live="polite">
-          <p id="result-headline" class="result-headline">Choose your hand</p>
-          <p id="result-detail" class="result-detail"></p>
+          <p id="result-mark" class="result-mark" aria-hidden="true"></p>
+          <p id="result-headline" class="result-headline">Make your move</p>
+          <p id="result-detail" class="result-detail">Choose Rock, Paper, or Scissors</p>
         </section>
 
         <section class="choices" aria-label="Choose your hand">
           <button type="button" class="choice-button" data-choice="rock" aria-pressed="false">
             <span class="choice-visual" aria-hidden="true">✊</span>
             <span class="choice-name">Rock</span>
+            <span class="choice-picked" aria-hidden="true">Your pick</span>
           </button>
           <button type="button" class="choice-button" data-choice="paper" aria-pressed="false">
             <span class="choice-visual" aria-hidden="true">✋</span>
             <span class="choice-name">Paper</span>
+            <span class="choice-picked" aria-hidden="true">Your pick</span>
           </button>
           <button type="button" class="choice-button" data-choice="scissors" aria-pressed="false">
             <span class="choice-visual" aria-hidden="true">✌️</span>
             <span class="choice-name">Scissors</span>
+            <span class="choice-picked" aria-hidden="true">Your pick</span>
           </button>
         </section>
       </div>
@@ -115,13 +122,13 @@
       </div>
     </div>
 
-    <details class="help-panel">
+    <details class="help-panel" aria-label="Game rules">
       <summary>Rules</summary>
       <ul>
-        <li>Enter your name to begin.</li>
-        <li>Choose Rock, Paper, or Scissors.</li>
-        <li>First to 5 points wins.</li>
-        <li>Play Again starts a rematch.</li>
+        <li>Rock beats Scissors</li>
+        <li>Scissors beats Paper</li>
+        <li>Paper beats Rock</li>
+        <li>First to 5 wins</li>
       </ul>
     </details>
 
