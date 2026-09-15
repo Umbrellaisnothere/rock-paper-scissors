@@ -123,7 +123,8 @@ h1, h2, h3, p {
 .btn-primary:focus-visible,
 .btn-play-again:focus-visible,
 .choice-button:focus-visible,
-.help-panel summary:focus-visible {
+.help-panel summary:focus-visible,
+.sound-toggle:focus-visible {
   outline: 2px solid var(--brand-2);
   outline-offset: 3px;
 }
@@ -819,6 +820,36 @@ input[type="text"]:focus {
   display: none;
 }
 
+.sound-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 20;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #14161b;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.sound-toggle:hover {
+  color: var(--text);
+}
+
+.sound-toggle[aria-pressed="true"] .sound-icon {
+  text-decoration: line-through;
+}
+
 @keyframes dropIn {
   from { transform: translateY(20px) scale(.98); opacity: 0 }
   to { transform: translateY(0) scale(1); opacity: 1 }
@@ -948,6 +979,11 @@ input[type="text"]:focus {
   .help-panel {
     top: 10px;
     right: 10px;
+  }
+
+  .sound-toggle {
+    top: 10px;
+    left: 10px;
   }
 }
 
