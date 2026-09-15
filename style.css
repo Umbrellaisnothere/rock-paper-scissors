@@ -486,6 +486,82 @@ input[type="text"]:focus {
   min-height: 0;
 }
 
+/* Match statistics */
+.match-stats,
+.end-stats {
+  width: 100%;
+  display: grid;
+  gap: 6px 8px;
+}
+
+.match-stats {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.end-stats {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin: 4px 0 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 2px 4px;
+}
+
+.stat-label {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.stat-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.stat--streak.is-hot .stat-label,
+.stat--streak.is-hot .stat-value {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.streak-note {
+  grid-column: 1 / -1;
+  min-height: 1.05em;
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.streak-note.is-visible {
+  color: var(--text);
+}
+
+.stat--best.is-record {
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(0, 212, 255, 0.35);
+}
+
+.stat--best.is-record .stat-value {
+  animation: scorePulse 0.35s ease-out;
+}
+
 /* Choice controls */
 .choices {
   display: flex;
@@ -785,7 +861,8 @@ input[type="text"]:focus {
   .hand-visual.is-revealing,
   .hand-card.is-thinking .hand-visual,
   .result.is-entering .result-headline,
-  .score-value.is-pulsed {
+  .score-value.is-pulsed,
+  .stat--best.is-record .stat-value {
     animation: none;
   }
 
@@ -812,6 +889,11 @@ input[type="text"]:focus {
 
   .hand-card {
     min-height: 148px;
+  }
+
+  .match-stats,
+  .end-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -853,6 +935,14 @@ input[type="text"]:focus {
 
   .choice-visual {
     font-size: 1.65rem;
+  }
+
+  .match-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .end-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .help-panel {
