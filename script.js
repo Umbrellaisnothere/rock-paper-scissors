@@ -52,6 +52,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const endStatLosses = document.getElementById("end-stat-losses");
   const endStatDraws = document.getElementById("end-stat-draws");
   const endStatBest = document.getElementById("end-stat-best");
+  const soundToggle = document.getElementById("sound-toggle");
+  const soundToggleLabel = document.getElementById("sound-toggle-label");
 
   const choices = document.querySelectorAll(".choice-button");
 
@@ -82,6 +84,117 @@ document.addEventListener("DOMContentLoaded", () => {
   const CPU_THINK_MS = 600;
   const REVEAL_TO_RESULT_MS = 220;
   const MATCH_END_DELAY_MS = 1100;
+
+  function createGameAudio() {
+    let ctx = null;
+    let output = null;
+    let muted = false;
+
+    function ensureContext() {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      if (!ctx) {
+        ctx = new AC();
+        output = ctx.createGain();
+        output.gain.value = 0.16;
+        output.connect(ctx.destination);
+      }
+      if (ctx.state === "suspended") {
+        ctx.resume().catch(() => {});
+      }
+      return ctx;
+    }
+
+    function beep(c, { freq, freqEnd, duration, type = "sine", gain = 0.2, delay = 0 }) {
+      const t0 = c.currentTime + delay;
+      const osc = c.createOscillator();
+      const amp = c.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, t0);
+      if (freqEnd) {
+        osc.frequency.exponentialRampToValueAtTime(Math.max(freqEnd, 20), t0 + duration);
+      }
+      amp.gain.setValueAtTime(0.0001, t0);
+      amp.gain.exponentialRampToValueAtTime(gain, t0 + 0.01);
+      amp.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+      osc.connect(amp);
+      amp.connect(output);
+      osc.start(t0);
+      osc.stop(t0 + duration + 0.02);
+    }
+
+    function play(builder) {
+      if (muted) return;
+      try {
+        const c = ensureContext();
+        if (!c) return;
+        builder(c);
+      } catch (_err) {
+        /* Audio must never break gameplay. */
+      }
+    }
+
+    return {
+      unlock() {
+        try {
+          ensureContext();
+        } catch (_err) {
+          /* Ignore locked or missing audio. */
+        }
+      },
+      isMuted() {
+        return muted;
+      },
+      setMuted(value) {
+        muted = Boolean(value);
+      },
+      playSelect() {
+        play((c) => beep(c, { freq: 880, duration: 0.05, gain: 0.12 }));
+      },
+      playReveal() {
+        play((c) => beep(c, { freq: 480, freqEnd: 720, duration: 0.11, gain: 0.14 }));
+      },
+      playWin() {
+        play((c) => {
+          beep(c, { freq: 523, duration: 0.08, gain: 0.14 });
+          beep(c, { freq: 659, duration: 0.1, gain: 0.14, delay: 0.07 });
+        });
+      },
+      playLoss() {
+        play((c) => beep(c, { freq: 280, freqEnd: 160, duration: 0.16, type: "triangle", gain: 0.12 }));
+      },
+      playDraw() {
+        play((c) => beep(c, { freq: 392, duration: 0.1, type: "triangle", gain: 0.12 }));
+      },
+      playMatchPoint() {
+        play((c) => {
+          beep(c, { freq: 698, duration: 0.09, gain: 0.11, delay: 0.16 });
+          beep(c, { freq: 880, duration: 0.12, gain: 0.11, delay: 0.24 });
+        });
+      },
+      playVictory() {
+        play((c) => {
+          beep(c, { freq: 523, duration: 0.1, gain: 0.15 });
+          beep(c, { freq: 659, duration: 0.1, gain: 0.15, delay: 0.09 });
+          beep(c, { freq: 784, duration: 0.18, gain: 0.16, delay: 0.18 });
+        });
+      },
+      playDefeat() {
+        play((c) => {
+          beep(c, { freq: 330, duration: 0.12, type: "triangle", gain: 0.12 });
+          beep(c, { freq: 220, duration: 0.2, type: "triangle", gain: 0.12, delay: 0.11 });
+        });
+      },
+    };
+  }
+
+  const audio = createGameAudio();
+
+  function renderSoundToggle() {
+    const muted = audio.isMuted();
+    soundToggle.setAttribute("aria-pressed", muted ? "true" : "false");
+    soundToggleLabel.textContent = muted ? "Sound off" : "Sound on";
+  }
 
   function show(el) {
     el.classList.remove("hidden");
@@ -315,6 +428,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   startBtn.addEventListener("click", () => {
+    audio.unlock();
     hide(welcomeScreen);
     show(nameScreen);
     playerNameInput.focus();
@@ -330,12 +444,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     clearNameError();
     playerName = name;
+    audio.unlock();
     startMatch();
   });
 
   restartBtn.addEventListener("click", () => {
+    audio.unlock();
     startMatch();
   });
+
+  soundToggle.addEventListener("click", () => {
+    audio.unlock();
+    audio.setMuted(!audio.isMuted());
+    renderSoundToggle();
+  });
+
+  renderSoundToggle();
 
   choices.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -391,6 +515,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (scorer === "player") pulseScore(playerScoreText);
     if (scorer === "computer") pulseScore(computerScoreText);
     updateMatchPoint();
+
+    if (kind === "win") audio.playWin();
+    else if (kind === "lose") audio.playLoss();
+    else audio.playDraw();
+
+    if (kind === "win" && playerScore === maxScore - 1) {
+      audio.playMatchPoint();
+    }
   }
 
   function playRound(playerChoice) {
@@ -398,6 +530,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (playerScore >= maxScore || computerScore >= maxScore) return;
 
     lockRound();
+    audio.unlock();
+    audio.playSelect();
     markSelectedChoice(playerChoice);
     setHand("player", playerChoice, { animate: true });
     setComputerThinking();
@@ -411,6 +545,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (generation !== roundGeneration) return;
       thinkTimeoutId = null;
       setHand("computer", computerChoice, { animate: true });
+      audio.playReveal();
 
       revealTimeoutId = setTimeout(() => {
         if (generation !== roundGeneration) return;
@@ -458,6 +593,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     renderEndStats();
+    if (playerWon) audio.playVictory();
+    else audio.playDefeat();
     hide(gameScreen);
     show(endScreen);
   }
