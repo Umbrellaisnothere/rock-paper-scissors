@@ -38,6 +38,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const finalComputerLabel = document.getElementById("final-computer-label");
   const finalRoundDetail = document.getElementById("final-round-detail");
   const nameError = document.getElementById("name-error");
+  const statRounds = document.getElementById("stat-rounds");
+  const statWins = document.getElementById("stat-wins");
+  const statLosses = document.getElementById("stat-losses");
+  const statDraws = document.getElementById("stat-draws");
+  const statStreak = document.getElementById("stat-streak");
+  const statBest = document.getElementById("stat-best");
+  const streakNote = document.getElementById("streak-note");
+  const streakStat = document.querySelector(".stat--streak");
+  const bestStat = document.querySelector(".stat--best");
+  const endStatRounds = document.getElementById("end-stat-rounds");
+  const endStatWins = document.getElementById("end-stat-wins");
+  const endStatLosses = document.getElementById("end-stat-losses");
+  const endStatDraws = document.getElementById("end-stat-draws");
+  const endStatBest = document.getElementById("end-stat-best");
 
   const choices = document.querySelectorAll(".choice-button");
 
@@ -56,6 +70,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let revealTimeoutId = null;
   let endGameTimeoutId = null;
   let lastRound = null;
+  const matchStats = {
+    rounds: 0,
+    wins: 0,
+    losses: 0,
+    draws: 0,
+    currentStreak: 0,
+    bestStreak: 0,
+  };
   const maxScore = 5;
   const CPU_THINK_MS = 600;
   const REVEAL_TO_RESULT_MS = 220;
@@ -164,6 +186,61 @@ document.addEventListener("DOMContentLoaded", () => {
     restartAnimation(el, "is-pulsed");
   }
 
+  function resetMatchStats() {
+    matchStats.rounds = 0;
+    matchStats.wins = 0;
+    matchStats.losses = 0;
+    matchStats.draws = 0;
+    matchStats.currentStreak = 0;
+    matchStats.bestStreak = 0;
+  }
+
+  function recordResolvedRound(kind) {
+    matchStats.rounds += 1;
+    let newBest = false;
+    if (kind === "win") {
+      matchStats.wins += 1;
+      matchStats.currentStreak += 1;
+      if (matchStats.currentStreak > matchStats.bestStreak) {
+        matchStats.bestStreak = matchStats.currentStreak;
+        newBest = matchStats.bestStreak >= 2;
+      }
+    } else if (kind === "lose") {
+      matchStats.losses += 1;
+      matchStats.currentStreak = 0;
+    } else if (kind === "draw") {
+      matchStats.draws += 1;
+    }
+    renderMatchStats(newBest);
+  }
+
+  function renderMatchStats(newBest = false) {
+    statRounds.textContent = String(matchStats.rounds);
+    statWins.textContent = String(matchStats.wins);
+    statLosses.textContent = String(matchStats.losses);
+    statDraws.textContent = String(matchStats.draws);
+    statStreak.textContent = String(matchStats.currentStreak);
+    statBest.textContent = String(matchStats.bestStreak);
+
+    const hotStreak = matchStats.currentStreak >= 2;
+    streakStat.classList.toggle("is-hot", hotStreak);
+    streakNote.textContent = hotStreak ? `${matchStats.currentStreak} win streak` : "";
+    streakNote.classList.toggle("is-visible", hotStreak);
+
+    bestStat.classList.remove("is-record");
+    if (newBest) {
+      restartAnimation(bestStat, "is-record");
+    }
+  }
+
+  function renderEndStats() {
+    endStatRounds.textContent = String(matchStats.rounds);
+    endStatWins.textContent = String(matchStats.wins);
+    endStatLosses.textContent = String(matchStats.losses);
+    endStatDraws.textContent = String(matchStats.draws);
+    endStatBest.textContent = String(matchStats.bestStreak);
+  }
+
   function updateMatchPoint() {
     const playerAtPoint = playerScore === maxScore - 1;
     const computerAtPoint = computerScore === maxScore - 1;
@@ -215,6 +292,8 @@ document.addEventListener("DOMContentLoaded", () => {
     clearScheduledTimers();
     playerScore = 0;
     computerScore = 0;
+    resetMatchStats();
+    renderMatchStats();
     playerNameDisplay.textContent = playerName || "Player";
     updateScores();
     resetArena();
@@ -301,6 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
       detail,
     };
 
+    recordResolvedRound(kind);
     setResult(kind, headline, detail);
     choices.forEach((btn) => {
       if (btn.classList.contains("is-selected")) {
@@ -377,6 +457,7 @@ document.addEventListener("DOMContentLoaded", () => {
       finalRoundDetail.textContent = lastRound.detail;
     }
 
+    renderEndStats();
     hide(gameScreen);
     show(endScreen);
   }
