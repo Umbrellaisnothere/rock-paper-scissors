@@ -43,23 +43,25 @@
             <span class="score-role">You</span>
             <span id="player-name-display" class="score-name">Player</span>
             <span id="player-score" class="score-value">0</span>
+            <span id="player-match-point" class="match-point">Match point</span>
           </div>
           <p class="score-vs" aria-hidden="true">VS</p>
           <div class="score-card score-card--computer">
             <span class="score-role">Opponent</span>
             <span class="score-name">Computer</span>
             <span id="computer-score" class="score-value">0</span>
+            <span id="computer-match-point" class="match-point">Match point</span>
           </div>
         </section>
 
         <section class="hands" aria-label="Current hands">
-          <div class="hand-card">
+          <div class="hand-card" id="player-hand-card">
             <span class="hand-owner">You</span>
             <span id="player-hand-visual" class="hand-visual" aria-hidden="true">?</span>
             <span id="player-hand-label" class="hand-label">Waiting</span>
           </div>
           <p class="hands-vs" aria-hidden="true">VS</p>
-          <div class="hand-card">
+          <div class="hand-card" id="computer-hand-card">
             <span class="hand-owner">Computer</span>
             <span id="computer-hand-visual" class="hand-visual" aria-hidden="true">?</span>
             <span id="computer-hand-label" class="hand-label">Waiting</span>
@@ -94,6 +96,21 @@
         <h2 id="end-winner"></h2>
         <p id="end-score" class="end-score"></p>
         <p id="end-message" class="end-message"></p>
+        <div id="final-round" class="final-round">
+          <p class="final-round-label">Final round</p>
+          <div class="final-hands">
+            <div class="final-hand">
+              <span id="final-player-visual" class="final-hand-visual" aria-hidden="true"></span>
+              <span id="final-player-label" class="final-hand-label"></span>
+            </div>
+            <p class="final-vs" aria-hidden="true">VS</p>
+            <div class="final-hand">
+              <span id="final-computer-visual" class="final-hand-visual" aria-hidden="true"></span>
+              <span id="final-computer-label" class="final-hand-label"></span>
+            </div>
+          </div>
+          <p id="final-round-detail" class="final-round-detail"></p>
+        </div>
         <button type="button" id="restart-btn" class="btn-play-again">Play Again</button>
       </div>
     </div>
