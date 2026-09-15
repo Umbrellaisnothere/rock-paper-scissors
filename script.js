@@ -104,9 +104,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function markSelectedChoice(playerChoice) {
     clearSelectedChoices();
     choices.forEach((btn) => {
-      if (btn.dataset.choice === playerChoice) {
-        btn.classList.add("is-selected");
-        btn.setAttribute("aria-pressed", "true");
+      const selected = btn.dataset.choice === playerChoice;
+      btn.classList.toggle("is-selected", selected);
+      btn.setAttribute("aria-pressed", selected ? "true" : "false");
+      if (!selected && document.activeElement === btn) {
+        btn.blur();
       }
     });
   }
