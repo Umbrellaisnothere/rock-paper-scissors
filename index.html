@@ -11,7 +11,7 @@
     <div id="welcome-screen" class="screen active">
       <h1>Welcome to Rock Paper Scissors!</h1>
       <div class="welcome-btns">
-        <button type="button" id="start-btn">Start Game</button>
+        <button type="button" id="start-btn" class="btn-primary">Start Game</button>
       </div>
     </div>
 
@@ -28,39 +28,85 @@
           aria-describedby="name-error"
           aria-invalid="false"
         />
-        <button type="submit" id="submit-name-btn">Continue</button>
+        <button type="submit" id="submit-name-btn" class="btn-primary">Continue</button>
         <div id="name-error" class="error" role="alert"></div>
       </form>
     </div>
 
     <div id="game-screen" class="screen hidden">
-      <h2 id="greeting"></h2>
-      <div class="scoreboard">
-        <p id="player-score">Player: 0</p>
-        <p id="computer-score">Computer: 0</p>
+      <div class="arena">
+        <h2 class="sr-only">Match versus Computer</h2>
+        <p class="match-objective">First to 5</p>
+
+        <section class="scoreboard" aria-label="Score">
+          <div class="score-card score-card--player">
+            <span class="score-role">You</span>
+            <span id="player-name-display" class="score-name">Player</span>
+            <span id="player-score" class="score-value">0</span>
+          </div>
+          <p class="score-vs" aria-hidden="true">VS</p>
+          <div class="score-card score-card--computer">
+            <span class="score-role">Opponent</span>
+            <span class="score-name">Computer</span>
+            <span id="computer-score" class="score-value">0</span>
+          </div>
+        </section>
+
+        <section class="hands" aria-label="Current hands">
+          <div class="hand-card">
+            <span class="hand-owner">You</span>
+            <span id="player-hand-visual" class="hand-visual" aria-hidden="true">?</span>
+            <span id="player-hand-label" class="hand-label">Waiting</span>
+          </div>
+          <p class="hands-vs" aria-hidden="true">VS</p>
+          <div class="hand-card">
+            <span class="hand-owner">Computer</span>
+            <span id="computer-hand-visual" class="hand-visual" aria-hidden="true">?</span>
+            <span id="computer-hand-label" class="hand-label">Waiting</span>
+          </div>
+        </section>
+
+        <section id="result" class="result result--idle" aria-live="polite">
+          <p id="result-headline" class="result-headline">Choose your hand</p>
+          <p id="result-detail" class="result-detail"></p>
+        </section>
+
+        <section class="choices" aria-label="Choose your hand">
+          <button type="button" class="choice-button" data-choice="rock" aria-pressed="false">
+            <span class="choice-visual" aria-hidden="true">✊</span>
+            <span class="choice-name">Rock</span>
+          </button>
+          <button type="button" class="choice-button" data-choice="paper" aria-pressed="false">
+            <span class="choice-visual" aria-hidden="true">✋</span>
+            <span class="choice-name">Paper</span>
+          </button>
+          <button type="button" class="choice-button" data-choice="scissors" aria-pressed="false">
+            <span class="choice-visual" aria-hidden="true">✌️</span>
+            <span class="choice-name">Scissors</span>
+          </button>
+        </section>
       </div>
-      <div class="choices">
-        <button type="button" class="choice-button" data-choice="rock">🪨 Rock</button>
-        <button type="button" class="choice-button" data-choice="paper">📄 Paper</button>
-        <button type="button" class="choice-button" data-choice="scissors">✂️ Scissors</button>
-      </div>
-      <p id="result"></p>
     </div>
 
     <div id="end-screen" class="screen hidden">
-      <h2 id="final-result"></h2>
-      <button type="button" id="restart-btn">Play Again</button>
+      <div id="match-summary" class="match-summary">
+        <p id="end-status" class="end-status"></p>
+        <h2 id="end-winner"></h2>
+        <p id="end-score" class="end-score"></p>
+        <p id="end-message" class="end-message"></p>
+        <button type="button" id="restart-btn" class="btn-play-again">Play Again</button>
+      </div>
     </div>
 
-    <div id="sidebar">
-      <h3>Instructions</h3>
+    <details class="help-panel">
+      <summary>Rules</summary>
       <ul>
-        <li><span class="inst-ico">📝</span> Enter your name to begin.</li>
-        <li><span class="inst-ico">✋</span> Choose Rock, Paper, or Scissors.</li>
-        <li><span class="inst-ico">🏆</span> First to 5 points wins.</li>
-        <li><span class="inst-ico">🔄</span> You can restart after each game.</li>
+        <li>Enter your name to begin.</li>
+        <li>Choose Rock, Paper, or Scissors.</li>
+        <li>First to 5 points wins.</li>
+        <li>Play Again starts a rematch.</li>
       </ul>
-    </div>
+    </details>
 
     <script src="script.js"></script>
   </body>
