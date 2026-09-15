@@ -77,6 +77,34 @@
           <p id="result-detail" class="result-detail">Choose Rock, Paper, or Scissors</p>
         </section>
 
+        <section class="match-stats" aria-label="Match statistics">
+          <div class="stat">
+            <span class="stat-label">Rounds</span>
+            <span id="stat-rounds" class="stat-value">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Wins</span>
+            <span id="stat-wins" class="stat-value">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Losses</span>
+            <span id="stat-losses" class="stat-value">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Draws</span>
+            <span id="stat-draws" class="stat-value">0</span>
+          </div>
+          <div class="stat stat--streak">
+            <span class="stat-label"><span class="sr-only">Current </span>Streak</span>
+            <span id="stat-streak" class="stat-value">0</span>
+          </div>
+          <div class="stat stat--best">
+            <span class="stat-label">Best<span class="sr-only"> streak</span></span>
+            <span id="stat-best" class="stat-value">0</span>
+          </div>
+          <p id="streak-note" class="streak-note"></p>
+        </section>
+
         <section class="choices" aria-label="Choose your hand">
           <button type="button" class="choice-button" data-choice="rock" aria-pressed="false">
             <span class="choice-visual" aria-hidden="true">✊</span>
@@ -118,6 +146,28 @@
           </div>
           <p id="final-round-detail" class="final-round-detail"></p>
         </div>
+        <section class="end-stats" aria-label="Match statistics">
+          <div class="stat">
+            <span class="stat-label">Rounds</span>
+            <span id="end-stat-rounds" class="stat-value">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Wins</span>
+            <span id="end-stat-wins" class="stat-value">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Losses</span>
+            <span id="end-stat-losses" class="stat-value">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Draws</span>
+            <span id="end-stat-draws" class="stat-value">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Best streak</span>
+            <span id="end-stat-best" class="stat-value">0</span>
+          </div>
+        </section>
         <button type="button" id="restart-btn" class="btn-play-again">Play Again</button>
       </div>
     </div>
