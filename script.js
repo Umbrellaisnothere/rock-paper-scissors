@@ -12,6 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const playerNameDisplay = document.getElementById("player-name-display");
   const playerScoreText = document.getElementById("player-score");
   const computerScoreText = document.getElementById("computer-score");
+  const playerMatchPoint = document.getElementById("player-match-point");
+  const computerMatchPoint = document.getElementById("computer-match-point");
+  const playerHandCard = document.getElementById("player-hand-card");
+  const computerHandCard = document.getElementById("computer-hand-card");
   const playerHandVisual = document.getElementById("player-hand-visual");
   const playerHandLabel = document.getElementById("player-hand-label");
   const computerHandVisual = document.getElementById("computer-hand-visual");
@@ -24,6 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const endWinner = document.getElementById("end-winner");
   const endScore = document.getElementById("end-score");
   const endMessage = document.getElementById("end-message");
+  const finalPlayerVisual = document.getElementById("final-player-visual");
+  const finalPlayerLabel = document.getElementById("final-player-label");
+  const finalComputerVisual = document.getElementById("final-computer-visual");
+  const finalComputerLabel = document.getElementById("final-computer-label");
+  const finalRoundDetail = document.getElementById("final-round-detail");
   const nameError = document.getElementById("name-error");
 
   const choices = document.querySelectorAll(".choice-button");
@@ -38,8 +47,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let playerScore = 0;
   let computerScore = 0;
   let isRoundLocked = false;
+  let roundGeneration = 0;
+  let thinkTimeoutId = null;
+  let revealTimeoutId = null;
   let endGameTimeoutId = null;
+  let lastRound = null;
   const maxScore = 5;
+  const CPU_THINK_MS = 600;
+  const REVEAL_TO_RESULT_MS = 220;
   const MATCH_END_DELAY_MS = 1100;
 
   function show(el) {
@@ -69,29 +84,80 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function clearScheduledTimers() {
+    roundGeneration += 1;
+    if (thinkTimeoutId !== null) {
+      clearTimeout(thinkTimeoutId);
+      thinkTimeoutId = null;
+    }
+    if (revealTimeoutId !== null) {
+      clearTimeout(revealTimeoutId);
+      revealTimeoutId = null;
+    }
     if (endGameTimeoutId !== null) {
       clearTimeout(endGameTimeoutId);
       endGameTimeoutId = null;
     }
   }
 
-  function setHand(side, choice) {
+  function restartAnimation(el, className) {
+    el.classList.remove(className);
+    void el.offsetWidth;
+    el.classList.add(className);
+  }
+
+  function setHand(side, choice, { animate = false } = {}) {
+    const card = side === "player" ? playerHandCard : computerHandCard;
     const visual = side === "player" ? playerHandVisual : computerHandVisual;
     const label = side === "player" ? playerHandLabel : computerHandLabel;
+    card.classList.remove("is-thinking");
     if (!choice) {
       visual.textContent = "?";
       label.textContent = "Waiting";
+      visual.classList.remove("is-revealing");
       return;
     }
     visual.textContent = HANDS[choice].emoji;
     label.textContent = HANDS[choice].name;
+    if (animate) {
+      restartAnimation(visual, "is-revealing");
+    } else {
+      visual.classList.remove("is-revealing");
+    }
+  }
+
+  function setComputerThinking() {
+    computerHandCard.classList.add("is-thinking");
+    computerHandVisual.classList.remove("is-revealing");
+    computerHandVisual.textContent = "?";
+    computerHandLabel.textContent = "Thinking...";
   }
 
   function setResult(kind, headline, detail) {
-    resultEl.classList.remove("result--idle", "result--win", "result--lose", "result--draw");
+    resultEl.classList.remove(
+      "result--idle",
+      "result--pending",
+      "result--win",
+      "result--lose",
+      "result--draw",
+      "is-entering"
+    );
     resultEl.classList.add(`result--${kind}`);
     resultHeadline.textContent = headline;
     resultDetail.textContent = detail || "";
+    if (kind === "win" || kind === "lose" || kind === "draw") {
+      restartAnimation(resultEl, "is-entering");
+    }
+  }
+
+  function pulseScore(el) {
+    restartAnimation(el, "is-pulsed");
+  }
+
+  function updateMatchPoint() {
+    const playerAtPoint = playerScore === maxScore - 1;
+    const computerAtPoint = computerScore === maxScore - 1;
+    playerMatchPoint.classList.toggle("is-active", playerAtPoint);
+    computerMatchPoint.classList.toggle("is-active", computerAtPoint);
   }
 
   function clearSelectedChoices() {
@@ -114,9 +180,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function resetArena() {
+    lastRound = null;
     setHand("player", null);
     setHand("computer", null);
     setResult("idle", "Choose your hand", "");
+    playerScoreText.classList.remove("is-pulsed");
+    computerScoreText.classList.remove("is-pulsed");
+    updateMatchPoint();
     clearSelectedChoices();
   }
 
@@ -173,48 +243,86 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  function playRound(playerChoice) {
-    if (isRoundLocked) return;
-    if (playerScore >= maxScore || computerScore >= maxScore) return;
-
-    lockRound();
-    markSelectedChoice(playerChoice);
-
-    const options = ["rock", "paper", "scissors"];
-    const computerChoice = options[Math.floor(Math.random() * options.length)];
+  function resolveRound(playerChoice, computerChoice) {
     const playerHand = HANDS[playerChoice];
     const computerHand = HANDS[computerChoice];
-
-    setHand("player", playerChoice);
-    setHand("computer", computerChoice);
+    let kind;
+    let headline;
+    let detail;
+    let scorer = null;
 
     if (playerChoice === computerChoice) {
-      setResult("draw", "Draw", `You both chose ${playerHand.name}`);
+      kind = "draw";
+      headline = "Draw";
+      detail = `Both players chose ${playerHand.name}`;
     } else if (
       (playerChoice === "rock" && computerChoice === "scissors") ||
       (playerChoice === "paper" && computerChoice === "rock") ||
       (playerChoice === "scissors" && computerChoice === "paper")
     ) {
       playerScore++;
-      setResult("win", "You win", `${playerHand.name} beats ${computerHand.name}`);
+      scorer = "player";
+      kind = "win";
+      headline = "You win";
+      detail = `${playerHand.name} beats ${computerHand.name}`;
     } else {
       computerScore++;
-      setResult("lose", "You lose", `${computerHand.name} beats ${playerHand.name}`);
+      scorer = "computer";
+      kind = "lose";
+      headline = "You lose";
+      detail = `${computerHand.name} beats ${playerHand.name}`;
     }
+
+    lastRound = {
+      playerChoice,
+      computerChoice,
+      kind,
+      detail,
+    };
+
+    setResult(kind, headline, detail);
     updateScores();
+    if (scorer === "player") pulseScore(playerScoreText);
+    if (scorer === "computer") pulseScore(computerScoreText);
+    updateMatchPoint();
+  }
 
-    if (playerScore >= maxScore || computerScore >= maxScore) {
-      endGameTimeoutId = setTimeout(() => {
-        endGameTimeoutId = null;
-        endGame();
-      }, MATCH_END_DELAY_MS);
-      return;
-    }
+  function playRound(playerChoice) {
+    if (isRoundLocked) return;
+    if (playerScore >= maxScore || computerScore >= maxScore) return;
 
-    // Defer unlock so extra clicks already queued in this turn cannot start another round.
-    setTimeout(() => {
-      unlockRound();
-    }, 0);
+    lockRound();
+    markSelectedChoice(playerChoice);
+    setHand("player", playerChoice, { animate: true });
+    setComputerThinking();
+    setResult("pending", "", "");
+
+    const options = ["rock", "paper", "scissors"];
+    const computerChoice = options[Math.floor(Math.random() * options.length)];
+    const generation = roundGeneration;
+
+    thinkTimeoutId = setTimeout(() => {
+      if (generation !== roundGeneration) return;
+      thinkTimeoutId = null;
+      setHand("computer", computerChoice, { animate: true });
+
+      revealTimeoutId = setTimeout(() => {
+        if (generation !== roundGeneration) return;
+        revealTimeoutId = null;
+        resolveRound(playerChoice, computerChoice);
+
+        if (playerScore >= maxScore || computerScore >= maxScore) {
+          endGameTimeoutId = setTimeout(() => {
+            if (generation !== roundGeneration) return;
+            endGameTimeoutId = null;
+            endGame();
+          }, MATCH_END_DELAY_MS);
+          return;
+        }
+
+        unlockRound();
+      }, REVEAL_TO_RESULT_MS);
+    }, CPU_THINK_MS);
   }
 
   function updateScores() {
@@ -232,6 +340,17 @@ document.addEventListener("DOMContentLoaded", () => {
     endMessage.textContent = playerWon
       ? "You defeated the Computer."
       : "Computer won this match.";
+
+    if (lastRound) {
+      const playerHand = HANDS[lastRound.playerChoice];
+      const computerHand = HANDS[lastRound.computerChoice];
+      finalPlayerVisual.textContent = playerHand.emoji;
+      finalPlayerLabel.textContent = playerHand.name;
+      finalComputerVisual.textContent = computerHand.emoji;
+      finalComputerLabel.textContent = computerHand.name;
+      finalRoundDetail.textContent = lastRound.detail;
+    }
+
     hide(gameScreen);
     show(endScreen);
   }
